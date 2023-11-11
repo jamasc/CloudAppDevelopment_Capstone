@@ -81,10 +81,11 @@ def registration_request(request):
 def get_dealerships(request):
     if request.method == "GET":
         url = "https://markschitten-3000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/dealerships"
-        # Get dealers from the URL
-        dealerships = get_dealers_from_cf(url)
+        dealerships = get_dealers_from_cf(url)  # restapis.py
         # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        dealer_names = []
+        for dealer in dealerships:
+            dealer_names.append(dealer.short_name)
         # Return a list of dealer short name
 #        return HttpResponse(dealer_names)
         return render(request, 'djangoapp/index.html', {"dealer_names":dealer_names})
@@ -95,8 +96,10 @@ def get_dealer_details(request, dealerId):
     if request.method == "GET":
         url = "https://markschitten-5000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
         reviews = get_dealer_reviews_from_cf(url, dealerId)
-        all_reviews = ' '.join([thisreview.review for thisreview in reviews])
-        return HttpResponse(all_reviews)
+        all_reviews = []
+        for thisreview in reviews:
+            all_reviews.append(thisreview.review)
+        return render(request, 'djangoapp/dealer_details.html', {"reviews":all_reviews})
 
 # Create a `add_review` view to submit a review
 def add_review(request, dealerId):
