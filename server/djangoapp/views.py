@@ -96,10 +96,10 @@ def get_dealer_details(request, dealerId):
     if request.method == "GET":
         url = "https://markschitten-5000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
         reviews = get_dealer_reviews_from_cf(url, dealerId)
-        all_reviews = []
-        for thisreview in reviews:
-            all_reviews.append(thisreview.review)
-        return render(request, 'djangoapp/dealer_details.html', {"reviews":all_reviews})
+#        all_reviews = []
+#        for thisreview in reviews:
+#            all_reviews.append(thisreview.review)
+        return render(request, 'djangoapp/dealer_details.html', {"reviews":reviews})
 
 # Create a `add_review` view to submit a review
 def add_review(request, dealerId):
@@ -112,6 +112,5 @@ def add_review(request, dealerId):
         review['review'] = "great"
         review['purchase'] = True
         review['purchase_date'] = datetime.utcnow().isoformat()
-        json_payload = dict()
-        json_payload["review"] = review
+        json_payload = {"review": review}
         post_request(url, json_payload, dealerId=dealerId)

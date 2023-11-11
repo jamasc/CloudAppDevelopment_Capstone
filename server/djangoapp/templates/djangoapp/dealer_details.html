@@ -42,8 +42,8 @@
 
     {% if reviews %}
         <h1>Reviews:</h1>
-        {% for review in reviews %}
-            <p>{{ review }}</p>
+        {% for thisreview in reviews %}
+            <p>{{ thisreview.name }} left the review: {{ thisreview.review }}. Sentiment: {{ thisreview.sentiment }}</p>
         {% endfor %}
     {% else %}
         <p>No reviews available for this dealer.</p>

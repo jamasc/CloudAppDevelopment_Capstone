@@ -9,7 +9,7 @@ def get_request(url, **kwargs):
     print("GET from {} ".format(url))
     try:
         # Call get method of requests library with URL and parameters
-        response = requests.get(url, headers={'Content-Type': 'application/json'}, params=kwargs, auth=HTTPBasicAuth('apikey', "0UisJ7LOaI543FUv_mrow7jRwOe6xAy9tKdmOmYuF2On"))
+        response = requests.get(url, headers={'Content-Type': 'application/json'}, params=kwargs)
     except:
         # If any error occurs
         print("Network exception occurred")
@@ -51,10 +51,6 @@ def get_dealers_from_cf(url, **kwargs):
             results.append(dealer_obj)
     return results
 
-# Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
-# def get_dealer_by_id_from_cf(url, dealerId):
-# - Call get_request() with specified arguments
-# - Parse JSON results into a DealerView object list
 def get_dealer_reviews_from_cf(url, dealerId):
     results = []
     # Call get_request with a URL parameter
@@ -78,14 +74,15 @@ def get_dealer_reviews_from_cf(url, dealerId):
             results.append(review_obj)
     return results
 
-
-# Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
-# def analyze_review_sentiments(text):
-# - Call get_request() with specified arguments
-# - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(text):
-    analyzed_text = get_request("https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/f35a808e-3e7c-49c4-a12a-9750ddcb934c", text=text)
-    return analyzed_text
+    url = "https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/f35a808e-3e7c-49c4-a12a-9750ddcb934c"
+    params = {
+        'version': '2022-04-07',  
+        'features': 'sentiment',
+        'text': text,
+    }
+    response = get_request(url, params=params, auth=HTTPBasicAuth('apikey', "0UisJ7LOaI543FUv_mrow7jRwOe6xAy9tKdmOmYuF2On"))
+    return response
 
 
 
