@@ -22,12 +22,13 @@ def post_request(url, json_payload, **kwargs):
     print(kwargs)
     print("POST to {} ".format(url))
     try:
-        requests.post(url, params=kwargs, json=json_payload)
+        response = requests.post(url, params=kwargs, json=json_payload)
+        status_code = response.status_code
+        print("With status {} ".format(status_code))
     except:
         # If any error occurs
         print("Network exception occurred")
-    status_code = response.status_code
-    print("With status {} ".format(status_code))
+    
 
 def get_dealers_from_cf(url, **kwargs):
     results = []

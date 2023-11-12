@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -79,38 +79,41 @@ def registration_request(request):
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
+    context=dict()
     if request.method == "GET":
         url = "https://markschitten-3000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/dealerships"
         dealerships = get_dealers_from_cf(url)  # restapis.py
-        # Concat all dealer's short name
-        dealer_names = []
-        for dealer in dealerships:
-            dealer_names.append(dealer.short_name)
-        # Return a list of dealer short name
-#        return HttpResponse(dealer_names)
-        return render(request, 'djangoapp/index.html', {"dealer_names":dealer_names})
+        context["dealer_list"] = dealerships
+#        for dealer in dealerships:
+#            dealer_names.append(dealer.short_name)
+        return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 def get_dealer_details(request, dealerId):
+    context = dict()
     if request.method == "GET":
         url = "https://markschitten-5000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
         reviews = get_dealer_reviews_from_cf(url, dealerId)
-#        all_reviews = []
-#        for thisreview in reviews:
-#            all_reviews.append(thisreview.review)
-        return render(request, 'djangoapp/dealer_details.html', {"reviews":reviews})
+        context["reviews"] = reviews
+        context["dealer_id"] = dealerId
+        print(context)
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
 def add_review(request, dealerId):
     user = request.user
+    url = "https://markschitten-5000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
     if(user.is_authenticated):
         review = dict()
-        review['id'] = 422
-        review['name'] = Bob
+        review['id'] = dealerId
+        review['name'] = "Bob"
         review['dealership'] = 29
         review['review'] = "great"
         review['purchase'] = True
         review['purchase_date'] = datetime.utcnow().isoformat()
         json_payload = {"review": review}
-        post_request(url, json_payload, dealerId=dealerId)
+        post_request(url, json_payload)
+        return render(request, 'djangoapp/add_review.html', {"reviews":json_payload})
+    else:
+        return redirect('djangoapp:index')
