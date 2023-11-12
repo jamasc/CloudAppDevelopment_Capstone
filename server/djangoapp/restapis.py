@@ -76,14 +76,27 @@ def get_dealer_reviews_from_cf(url, dealerId):
     return results
 
 def analyze_review_sentiments(text):
-    url = "https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/f35a808e-3e7c-49c4-a12a-9750ddcb934c"
-    params = {
-        'version': '2022-04-07',  
-        'features': 'sentiment',
-        'text': text,
+    url = "https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/f35a808e-3e7c-49c4-a12a-9750ddcb934c/v1/analyze?version=2022-04-07"
+    api_key = "0UisJ7LOaI543FUv_mrow7jRwOe6xAy9tKdmOmYuF2On"
+
+    headers = {
+        "Content-Type": "application/json",
     }
-    response = get_request(url, params=params, auth=HTTPBasicAuth('apikey', "0UisJ7LOaI543FUv_mrow7jRwOe6xAy9tKdmOmYuF2On"))
-    return response
+    params = {
+        "version": "2022-04-07",
+    }
+    data = {
+        "text": text,
+        "features": {
+        "sentiment": {},
+        },
+    }
+    response = requests.post(url, headers=headers, params=params, json=data, auth=("apikey", api_key))
+    result = response.json()
+
+    sentiment = result.get("sentiment", {}).get("document", {}).get("label")
+
+    return sentiment
 
 
 
